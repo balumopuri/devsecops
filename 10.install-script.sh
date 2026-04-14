@@ -29,6 +29,19 @@ else
 fi
     
 
+dnf install -y apache2
+
+    if [ $? -ne 0 ]
+    then 
+        echo "Installing Apache.... Failure"
+        exit 1
+    else
+        echo "Installing Apache.....success"
+    fi   
+else                 
+    echo "Apache is already installed"
+fi
+
 
 
 
