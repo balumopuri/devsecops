@@ -8,7 +8,13 @@ then
     exit 1
 fi
 
-dnf install mysql -y
+
+dnf install -y https://repo.mysql.com/mysql80-community-release-el9-1.noarch.rpm \
+|| dnf install -y https://repo.mysql.com/mysql80-community-release-el8-1.noarch.rpm
+
+# Install MySQL Server
+dnf install -y mysql-community-server
+
 
 if [ $? -ne 0 ]
 then 
