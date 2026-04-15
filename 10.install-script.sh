@@ -25,8 +25,21 @@ dnf install -y mysql-community-server
 else                 
     echo "MYSQL is already installed"
 fi
-    
 
+dnf list installed git 
+    if [ $? -ne 0 ]
+    then 
+        dnf install git -y
+        if [ $? -ne 0 ]
+    then
+        echo "Installing Git.... Failure"
+        exit 1
+    else
+        echo "Installing Git.....success"
+    fi   
+else                 
+    echo "Git is already installed"
+fi
 
 
 
