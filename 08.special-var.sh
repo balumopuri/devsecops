@@ -7,5 +7,5 @@ echo "Present working directory: $PWD"
 echo "Home dir of current user: $HOME"
 echo "which user is running the script: $USER"
 echo "process id of the script: $$"
-sleep 10 &
+sleep 5 &
 echo "process id of last command in background:$!"
