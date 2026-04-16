@@ -6,6 +6,10 @@ echo "Today Date is: $TIMESTAMP"
 
 echo "$(pwd)"
 
-echo "$( ls -a )"
+# echo "$( ls -a )"
 
 echo "$( who )"
+
+echo "$( uptime )"
+
+echo "( du -f / )"
