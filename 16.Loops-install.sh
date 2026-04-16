@@ -28,7 +28,7 @@ then
     exit 1
 fi
 
-for package in $@
+for package in "$@"
 do
     dnf list installed $package &>>"$LOG_FILE_NAME"
     if [ $? -ne 0 ]
