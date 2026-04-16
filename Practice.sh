@@ -13,3 +13,5 @@ echo "$( who )"
 echo "$( uptime )"
 
 echo "$( df -h / )"
+
+echo "$( count -h /)"
