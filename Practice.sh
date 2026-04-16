@@ -1,5 +1,5 @@
 #!/bin/bash
 
-TIMESTAMP=$(DATE)
+TIMESTAMP=$(date +"%Y-%m-%d-%H-%M-%S")TE)
 
 echo "Today Date is: $TIMESTAMP"
