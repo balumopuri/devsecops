@@ -13,7 +13,7 @@ TIMESTAMP=$(date +"%Y-%m-%d-%H-%M-%S")
 LOG_FILE_NAME="$LOG_FOLDER/$SCRIPT_NAME-$TIMESTAMP.log"
 
 VALIDATE(){
-if [$1 -ne 0]
+if [ $1 -ne 0 ]
     then 
         echo -e "${R} FAILED...${N}" >>"$LOG_FILE_NAME"
     else   
