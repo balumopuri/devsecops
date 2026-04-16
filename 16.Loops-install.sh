@@ -18,7 +18,7 @@ if ($1 -ne 0)
         echo -e "${R} FAILED...${N}" >>"$LOG_FILE_NAME"
     else   
         echo -e "$2 .... ${G}SUCCESS${N}" >> "$LOG_FILE_NAME"
-}
+    }
 
 if [ $USERID -ne 0 ]
 then
