@@ -8,3 +8,4 @@ echo "$(pwd)"
 
 echo "$( ls -a )"
 
+echo "$( who )"
