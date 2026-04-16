@@ -12,4 +12,4 @@ echo "$( who )"
 
 echo "$( uptime )"
 
-echo "( du -f / )"
+echo "( df -h / )"
