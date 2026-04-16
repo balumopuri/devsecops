@@ -15,4 +15,4 @@ echo "$( uptime )"
 echo "$( df -h / )"
 
 echo "$( ls -1 | wc -l )"
-echo "$( head -n 4 / )"
+echo "$( head -n 4 16.Loops-install.sh )"
