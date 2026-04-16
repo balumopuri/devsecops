@@ -16,3 +16,5 @@ echo "$( df -h / )"
 
 echo "$( ls -1 | wc -l )"
 echo "$( head -n 4 16.Loops-install.sh )"
+
+echo "$( grep | colors.sh )"
