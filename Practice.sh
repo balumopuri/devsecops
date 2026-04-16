@@ -14,4 +14,4 @@ echo "$( uptime )"
 
 echo "$( df -h / )"
 
-echo "$( count -h /)"
+echo "$( ls -1 | wc -l )"
