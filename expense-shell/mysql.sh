@@ -1,9 +1,11 @@
 #!/bin/bash
 
-R="[/e31m";
-G="[/e32m";
-Y="[/e33m";
-N="[/e0m";
+
+R="\e[31m"
+G="\e[32m"
+Y="\e[33m"
+N="\e[0m
+
 
 # Log configuration
 LOG_FOLDER="/var/shellscript-logs"
@@ -20,7 +22,14 @@ VALIDATE(){
     fi
 }
 
-CHECK_ROOT
+CHECK_ROOT() {
+    if [ "$(id -u)" -ne 0 ]; 
+    then
+        echo -e "${R}ERROR: You must run this script as root or with sudo${N}"
+        exit 1
+    fi
+}
+
 
 mkdir -p "$LOG_FOLDER"
 
