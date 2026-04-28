@@ -164,6 +164,9 @@ if [[ "$OS_NAME" == *"Amazon Linux"* ]]; then
     systemctl start mariadb &>>"$LOG_FILE_NAME"
     VALIDATE $? "Starting MariaDB service"
 
+    mysql_secure_installation --set-root-pass ExpenseApp@1 &>>"$LOG_FILE_NAME"
+    VALIDATE $? "Setting up root password"
+
 elif [[ "$OS_NAME" == *"Red Hat"* || "$OS_NAME" == *"CentOS"* ]]; then
     echo "Installing MySQL on RHEL/CentOS" &>>"$LOG_FILE_NAME"
 
@@ -176,6 +179,9 @@ elif [[ "$OS_NAME" == *"Red Hat"* || "$OS_NAME" == *"CentOS"* ]]; then
     systemctl start mysqld &>>"$LOG_FILE_NAME"
     VALIDATE $? "Starting MySQL service"
 
+    mysql_secure_installation --set-root-pass ExpenseApp@1 &>>"$LOG_FILE_NAME"
+    VALIDATE $? "Setting up root password"
+
 else
     echo -e "${R}Unsupported OS detected: $OS_NAME${N}" | tee -a "$LOG_FILE_NAME"
     exit 1
@@ -183,4 +189,3 @@ fi
 
 echo -e "${G}Database installation completed successfully${N}"
 echo "Script completed at: $(date)" &>>"$LOG_FILE_NAME"
-``
