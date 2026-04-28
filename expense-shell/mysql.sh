@@ -11,7 +11,7 @@ SCRIPT_NAME=$(basename "$0" .sh)
 TIMESTAMP=$(date +"%Y-%m-%d-%H-%M-%S")
 LOG_FILE_NAME="$LOG_FOLDER/$SCRIPT_NAME-$TIMESTAMP.log"
 
-VALIDATE=(){
+VALIDATE(){
     if [ $1 -ne 0 ]
     then
         echo -e "$2 .....$R FAILURE $N"
@@ -20,15 +20,11 @@ VALIDATE=(){
     fi
 }
 
-CHECK_ROOT(){
-    if [ $USERID -ne 0 ]
-    then 
-        echo "ERROR: You must need sudo access to execute this script"
-        exit 1
-    fi
-}
+CHECK_ROOT
 
-echo "Script satrted executing at: $TIMESTAMP" &>>$LOG_FILE_NAME
+mkdir -p "$LOG_FOLDER"
+
+echo "Script started executing at: $TIMESTAMP" &>>"$LOG_FILE_NAME"
 
 
 dnf install mysql-server -y &>>$LOG_FILE_NAME
