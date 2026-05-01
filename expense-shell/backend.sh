@@ -41,7 +41,7 @@ VALIDATE $? "Disabling NodeJS module"
 dnf install nodejs -y &>>"$LOG_FILE_NAME"
 VALIDATE $? "Installing NodeJS"
 
-dnf enable nodejs:20 -y &>>"$LOG_FILE_NAME"
+dnf module enable nodejs:20 -y &>>"$LOG_FILE_NAME"
 VALIDATE $? "Enabling NodeJS 20"
 
 useradd expense
