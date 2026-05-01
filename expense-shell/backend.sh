@@ -46,11 +46,11 @@ VALIDATE $? "Installing NodeJS"
 dnf module enable nodejs:20 -y &>>"$LOG_FILE_NAME"
 VALIDATE $? "Enabling NodeJS 20"
 
-# useradd expense
-# VALIDATE $? "Creating user 'expense'"
+useradd expense
+VALIDATE $? "Creating user 'expense'"
 
-# mkdir /app
-# VALIDATE $? "Creating /app directory"
+mkdir /app
+VALIDATE $? "Creating /app directory"
 
 dnf install unzip -y &>>"$LOG_FILE_NAME"
 VALIDATE $? "Installing unzip"
