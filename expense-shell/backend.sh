@@ -88,6 +88,8 @@
 #!/bin/bash
 
 USERID=$(id -u)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SERVICE_FILE="$SCRIPT_DIR/backend.service"
 R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
@@ -153,14 +155,28 @@ VALIDATE $? "unzip backend"
 npm install &>>$LOG_FILE_NAME
 VALIDATE $? "Installing dependencies"
 
-cp C:\Users\HP\OneDrive\Desktop\git clione\devsecops\expense-shell\backend.service /etc/systemd/system/backend.service &>>$LOG_FILE_NAME
+if [ ! -f "$SERVICE_FILE" ]; then
+    echo "ERROR: backend.service not found at $SERVICE_FILE" &>>$LOG_FILE_NAME
+    exit 1
+fi
+cp "$SERVICE_FILE" /etc/systemd/system/backend.service &>>$LOG_FILE_NAME
+VALIDATE $? "Copying backend service"
 
 # Prepare MySQL Schema
 
 dnf install mysql -y &>>$LOG_FILE_NAME
 VALIDATE $? "Installing MySQL Client"
 
-mysql -h mysql.daws82s.online -uroot -pExpenseApp@1 < /app/schema/backend.sql &>>$LOG_FILE_NAME
+SQL_FILE="/app/schema/backend.sql"
+if [ ! -f "$SQL_FILE" ]; then
+    echo "ERROR: SQL schema file not found at $SQL_FILE" &>>$LOG_FILE_NAME
+    exit 1
+fi
+
+mysql --protocol=TCP -h mysql.balaportfolio.space -uroot -pExpenseApp@1 -e "SELECT 1;" &>>$LOG_FILE_NAME
+VALIDATE $? "Verifying MySQL connectivity"
+
+mysql --protocol=TCP -h mysql.balaportfolio.space -uroot -pExpenseApp@1 < "$SQL_FILE" &>>$LOG_FILE_NAME
 VALIDATE $? "Setting up the transactions schema and tables"
 
 systemctl daemon-reload &>>$LOG_FILE_NAME
