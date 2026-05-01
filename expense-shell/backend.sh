@@ -61,7 +61,7 @@ cd /app
 npm install &>>"$LOG_FILE_NAME"
 VALIDATE $? "Installing backend dependencies"
 
-cp /path/to/backend.service /etc/systemd/system/backend.service
+cp C:\Users\HP\OneDrive\Desktop\git clione\devsecops\expense-shell\backend.service /etc/systemd/system/backend.service
 VALIDATE $? "Copying backend service file"
 
 dnf install mysql-server -y &>>"$LOG_FILE_NAME"
