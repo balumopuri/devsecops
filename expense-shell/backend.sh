@@ -9,12 +9,13 @@ N="\e[0m"
 # ---------------- Log configuration ----------------
 LOG_FOLDER="/var/shellscript-logs"
 SCRIPT_NAME=$(basename "$0" .sh)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TIMESTAMP=$(date +"%Y-%m-%d-%H-%M-%S")
 LOG_FILE_NAME="$LOG_FOLDER/$SCRIPT_NAME-$TIMESTAMP.log"
 
 # ---------------- Functions ----------------
 VALIDATE() {
-    if [ $1 -ne 0 ]; then
+    if [ "$1" -ne 0 ]; then
         echo -e "$2 ..... ${R}FAILURE${N}"
         exit 1
     else
@@ -32,6 +33,7 @@ CHECK_ROOT() {
 # ---------------- Pre-Checks ----------------
 CHECK_ROOT
 mkdir -p "$LOG_FOLDER"
+mkdir -p /app
 
 echo "Script started at: $TIMESTAMP" &>>"$LOG_FILE_NAME"
 
@@ -50,7 +52,10 @@ VALIDATE $? "Enabling NodeJS 20"
 # mkdir /app
 # VALIDATE $? "Creating /app directory"
 
-curl -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip
+dnf install unzip -y &>>"$LOG_FILE_NAME"
+VALIDATE $? "Installing unzip"
+
+curl -fL -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip &>>"$LOG_FILE_NAME"
 VALIDATE $? "Downloading backend code"
 
 cd /app
@@ -61,16 +66,16 @@ cd /app
 npm install &>>"$LOG_FILE_NAME"
 VALIDATE $? "Installing backend dependencies"
 
-cp C:\Users\HP\OneDrive\Desktop\git clione\devsecops\expense-shell\backend.service /etc/systemd/system/backend.service
+cp "$SCRIPT_DIR/backend.service" /etc/systemd/system/backend.service &>>"$LOG_FILE_NAME"
 VALIDATE $? "Copying backend service file"
 
 dnf install mysql-server -y &>>"$LOG_FILE_NAME"
 VALIDATE $? "Installing MySQL server"
 
-mysql -h mysql.balaportfolio.space -uroot -pExpenseApp@1 < /app/schema/backend.sql
+mysql -h mysql.balaportfolio.space -uroot -pExpenseApp@1 < /app/schema/backend.sql &>>"$LOG_FILE_NAME"
 VALIDATE $? "Initializing backend database"
 
-systemctl daemon-reload
+systemctl daemon-reload &>>"$LOG_FILE_NAME"
 VALIDATE $? "Reloading systemd daemon"
 
 systemctl enable backend &>>"$LOG_FILE_NAME"
