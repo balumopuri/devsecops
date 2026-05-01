@@ -1,85 +1,173 @@
+# #!/bin/bash
+
+# # ---------------- Colors ----------------
+# R="\e[31m"
+# G="\e[32m"
+# Y="\e[33m"
+# N="\e[0m"
+
+# # ---------------- Log configuration ----------------
+# LOG_FOLDER="/var/shellscript-logs"
+# SCRIPT_NAME=$(basename "$0" .sh)
+# SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# TIMESTAMP=$(date +"%Y-%m-%d-%H-%M-%S")
+# LOG_FILE_NAME="$LOG_FOLDER/$SCRIPT_NAME-$TIMESTAMP.log"
+
+# # ---------------- Functions ----------------
+# VALIDATE() {
+#     if [ "$1" -ne 0 ]; then
+#         echo -e "$2 ..... ${R}FAILURE${N}"
+#         exit 1
+#     else
+#         echo -e "$2 ..... ${G}SUCCESS${N}"
+#     fi
+# }
+
+# CHECK_ROOT() {
+#     if [ "$(id -u)" -ne 0 ]; then
+#         echo -e "${R}ERROR: Please run this script as root or with sudo${N}"
+#         exit 1
+#     fi
+# }
+
+# # ---------------- Pre-Checks ----------------
+# CHECK_ROOT
+# mkdir -p "$LOG_FOLDER"
+# mkdir -p /app
+
+# echo "Script started at: $TIMESTAMP" &>>"$LOG_FILE_NAME"
+
+# dnf module disable nodejs -y &>>"$LOG_FILE_NAME"
+# VALIDATE $? "Disabling NodeJS module"
+
+# dnf install nodejs -y &>>"$LOG_FILE_NAME"
+# VALIDATE $? "Installing NodeJS"
+
+# dnf module enable nodejs:20 -y &>>"$LOG_FILE_NAME"
+# VALIDATE $? "Enabling NodeJS 20"
+
+# useradd expense
+# VALIDATE $? "Creating user 'expense'"
+
+# mkdir /app
+# VALIDATE $? "Creating /app directory"
+
+# dnf install unzip -y &>>"$LOG_FILE_NAME"
+# VALIDATE $? "Installing unzip"
+
+# curl -fL -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip &>>"$LOG_FILE_NAME"
+# VALIDATE $? "Downloading backend code"
+
+# cd /app
+# unzip /tmp/backend.zip &>>"$LOG_FILE_NAME"
+# VALIDATE $? "Extracting backend code"
+
+# cd /app
+# npm install &>>"$LOG_FILE_NAME"
+# VALIDATE $? "Installing backend dependencies"
+
+# cp "$SCRIPT_DIR/backend.service" /etc/systemd/system/backend.service &>>"$LOG_FILE_NAME"
+# VALIDATE $? "Copying backend service file"
+
+# dnf install mysql-server -y &>>"$LOG_FILE_NAME"
+# VALIDATE $? "Installing MySQL server"
+
+# mysql -h mysql.balaportfolio.space -uroot -pExpenseApp@1 < /app/schema/backend.sql &>>"$LOG_FILE_NAME"
+# VALIDATE $? "Initializing backend database"
+
+# systemctl daemon-reload &>>"$LOG_FILE_NAME"
+# VALIDATE $? "Reloading systemd daemon"
+
+# systemctl enable backend &>>"$LOG_FILE_NAME"
+# VALIDATE $? "Enabling backend service"
+
+# systemctl restart backend &>>"$LOG_FILE_NAME"
+# VALIDATE $? "Restarting backend service"
+
+
 #!/bin/bash
 
-# ---------------- Colors ----------------
+USERID=$(id -u)
 R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
 
-# ---------------- Log configuration ----------------
-LOG_FOLDER="/var/shellscript-logs"
-SCRIPT_NAME=$(basename "$0" .sh)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TIMESTAMP=$(date +"%Y-%m-%d-%H-%M-%S")
-LOG_FILE_NAME="$LOG_FOLDER/$SCRIPT_NAME-$TIMESTAMP.log"
+LOGS_FOLDER="/var/log/expense-logs"
+LOG_FILE=$(echo $0 | cut -d "." -f1 )
+TIMESTAMP=$(date +%Y-%m-%d-%H-%M-%S)
+LOG_FILE_NAME="$LOGS_FOLDER/$LOG_FILE-$TIMESTAMP.log"
 
-# ---------------- Functions ----------------
-VALIDATE() {
-    if [ "$1" -ne 0 ]; then
-        echo -e "$2 ..... ${R}FAILURE${N}"
+VALIDATE(){
+    if [ $1 -ne 0 ]
+    then
+        echo -e "$2 ... $R FAILURE $N"
         exit 1
     else
-        echo -e "$2 ..... ${G}SUCCESS${N}"
+        echo -e "$2 ... $G SUCCESS $N"
     fi
 }
 
-CHECK_ROOT() {
-    if [ "$(id -u)" -ne 0 ]; then
-        echo -e "${R}ERROR: Please run this script as root or with sudo${N}"
-        exit 1
+CHECK_ROOT(){
+    if [ $USERID -ne 0 ]
+    then
+        echo "ERROR:: You must have sudo access to execute this script"
+        exit 1 #other than 0
     fi
 }
 
-# ---------------- Pre-Checks ----------------
+echo "Script started executing at: $TIMESTAMP" &>>$LOG_FILE_NAME
+
 CHECK_ROOT
-mkdir -p "$LOG_FOLDER"
-mkdir -p /app
 
-echo "Script started at: $TIMESTAMP" &>>"$LOG_FILE_NAME"
+dnf module disable nodejs -y &>>$LOG_FILE_NAME
+VALIDATE $? "Disabling existing default NodeJS"
 
-dnf module disable nodejs -y &>>"$LOG_FILE_NAME"
-VALIDATE $? "Disabling NodeJS module"
-
-dnf install nodejs -y &>>"$LOG_FILE_NAME"
-VALIDATE $? "Installing NodeJS"
-
-dnf module enable nodejs:20 -y &>>"$LOG_FILE_NAME"
+dnf module enable nodejs:20 -y &>>$LOG_FILE_NAME
 VALIDATE $? "Enabling NodeJS 20"
 
-useradd expense
-VALIDATE $? "Creating user 'expense'"
+dnf install nodejs -y &>>$LOG_FILE_NAME
+VALIDATE $? "Installing NodeJS"
 
-mkdir /app
-VALIDATE $? "Creating /app directory"
+id expense &>>$LOG_FILE_NAME
+if [ $? -ne 0 ]
+then
+    useradd expense &>>$LOG_FILE_NAME
+    VALIDATE $? "Adding expense user"
+else
+    echo -e "expense user already exists ... $Y SKIPPING $N"
+fi
 
-dnf install unzip -y &>>"$LOG_FILE_NAME"
-VALIDATE $? "Installing unzip"
+mkdir -p /app &>>$LOG_FILE_NAME
+VALIDATE $? "Creating app directory"
 
-curl -fL -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip &>>"$LOG_FILE_NAME"
-VALIDATE $? "Downloading backend code"
+curl -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip &>>$LOG_FILE_NAME
+VALIDATE $? "Downloading backend"
 
 cd /app
-unzip /tmp/backend.zip &>>"$LOG_FILE_NAME"
-VALIDATE $? "Extracting backend code"
+rm -rf /app/*
 
-cd /app
-npm install &>>"$LOG_FILE_NAME"
-VALIDATE $? "Installing backend dependencies"
+unzip /tmp/backend.zip &>>$LOG_FILE_NAME
+VALIDATE $? "unzip backend"
 
-cp "$SCRIPT_DIR/backend.service" /etc/systemd/system/backend.service &>>"$LOG_FILE_NAME"
-VALIDATE $? "Copying backend service file"
+npm install &>>$LOG_FILE_NAME
+VALIDATE $? "Installing dependencies"
 
-dnf install mysql-server -y &>>"$LOG_FILE_NAME"
-VALIDATE $? "Installing MySQL server"
+cp C:\Users\HP\OneDrive\Desktop\git clione\devsecops\expense-shell\backend.service /etc/systemd/system/backend.service &>>$LOG_FILE_NAME
 
-mysql -h mysql.balaportfolio.space -uroot -pExpenseApp@1 < /app/schema/backend.sql &>>"$LOG_FILE_NAME"
-VALIDATE $? "Initializing backend database"
+# Prepare MySQL Schema
 
-systemctl daemon-reload &>>"$LOG_FILE_NAME"
-VALIDATE $? "Reloading systemd daemon"
+dnf install mysql -y &>>$LOG_FILE_NAME
+VALIDATE $? "Installing MySQL Client"
 
-systemctl enable backend &>>"$LOG_FILE_NAME"
-VALIDATE $? "Enabling backend service"
+mysql -h mysql.daws82s.online -uroot -pExpenseApp@1 < /app/schema/backend.sql &>>$LOG_FILE_NAME
+VALIDATE $? "Setting up the transactions schema and tables"
 
-systemctl restart backend &>>"$LOG_FILE_NAME"
-VALIDATE $? "Restarting backend service"
+systemctl daemon-reload &>>$LOG_FILE_NAME
+VALIDATE $? "Daemon Reload"
+
+systemctl enable backend &>>$LOG_FILE_NAME
+VALIDATE $? "Enabling backend"
+
+systemctl restart backend &>>$LOG_FILE_NAME
+VALIDATE $? "Starting Backend"
