@@ -15,7 +15,7 @@
 # VALIDATE(){
 #     if [ $1 -ne 0 ]
 #     then 
-#         echo -e "${R} FAILED...${N}" >> "$LOG_FILE_NAME"
+#         echo -e "$2......{R} FAILED...${N}" >>"$LOG_FILE_NAME"
 #         exit 1
 #     else   
 #         echo -e "$2 .... ${G}SUCCESS${N}" >> "$LOG_FILE_NAME"

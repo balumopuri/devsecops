@@ -2,6 +2,15 @@
 
 USERID=$(id -u)
 
+VALIDATE(){
+    if [ $1 -ne 0 ]
+        then 
+            echo "$2.... Failure"
+            exit 1
+        else
+            echo "$2.....success"
+        fi
+}
 if [ $USERID -ne 0 ]
 then 
     echo "Error:: you must have sudo access to execute the script"
@@ -14,14 +23,7 @@ dnf install -y https://repo.mysql.com/mysql80-community-release-el9-1.noarch.rpm
 
 # Install MySQL Server
     dnf install -y mysql-community-server
-
-        if [ $? -ne 0 ]
-        then 
-            echo "Installing MySQL.... Failure"
-            exit 1
-        else
-            echo "Installing MySQL.....success"
-        fi   
+        VALIDATE $? "Installing MYSQL"
     else                 
     echo "MYSQL is already installed"
 fi
@@ -30,13 +32,7 @@ fi
         if [ $? -ne 0 ]
         then 
             dnf install git -y
-            if [ $? -ne 0 ]
-        then
-            echo "Installing Git.... Failure"
-            exit 1
-        else
-            echo "Installing Git.....success"
-        fi   
+         VALIDATE $2 "Installing GIT"
     else                 
         echo "Git is already installed"
     fi
