@@ -68,6 +68,7 @@ VALIDATE $? "Installing dependencies"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cp "$SCRIPT_DIR/backend.service" /etc/systemd/system/backend.service &>>$LOG_FILE_NAME
+VALIDATE $? "Copying backend service" &>>$LOG_FILE_NAME
 # Prepare MySQL Schema
 
 dnf install mysql -y &>>$LOG_FILE_NAME
