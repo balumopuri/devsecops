@@ -66,13 +66,14 @@ VALIDATE $? "unzip backend"
 npm install &>>$LOG_FILE_NAME
 VALIDATE $? "Installing dependencies"
 
-cp /mnt/c/Users/Chaitu/Desktop/Balu-dev/devsecops/expense-shell/backend.service /etc/systemd/system/backend.service &>>$LOG_FILE_NAME
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cp "$SCRIPT_DIR/backend.service" /etc/systemd/system/backend.service &>>$LOG_FILE_NAME
 # Prepare MySQL Schema
 
 dnf install mysql -y &>>$LOG_FILE_NAME
 VALIDATE $? "Installing MySQL Client"
 
-mysql -h mysql.balaportfolio.space -uroot -pExpenseApp@1 < /app/schema/backend.sql &>>$LOG_FILE_NAME
+mysql --protocol=TCP -h mysql.balaportfolio.space -uroot -pExpenseApp@1 < /app/schema/backend.sql &>>$LOG_FILE_NAME
 VALIDATE $? "Setting up the transactions schema and tables"
 
 systemctl daemon-reload &>>$LOG_FILE_NAME
