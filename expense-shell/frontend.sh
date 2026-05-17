@@ -53,9 +53,6 @@ cd /usr/share/nginx/html
 unzip /tmp/frontend.zip &>>$LOG_FILE_NAME
 VALIDATE $? "Extracting frontend"
 
-cp /home/ec2-user/devsecops/expense-shell/backend.service /etc/systemd/system/backend.service
-VALIDATE $? "Copying backend service" &>>$LOG_FILE_NAME
-
 systemctl restart nginx
 VALIDATE $? "Restarting Nginx"
 
